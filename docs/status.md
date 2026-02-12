@@ -2,38 +2,29 @@
 
 **Last Updated**: 2026-02-12
 
-## Overall Status: Skeleton / Pre-MVP
+## Overall Status: MVP Working
 
-The repo contains initial scaffolding but is not yet functional.
+Both Pong and Asteroids are playable in the browser via `trunk serve`.
 
 ## Build Status
 
 | Check | Status |
 |-------|--------|
-| `cargo check` | FAILING |
-| `trunk build` | NOT TESTED |
-| `trunk serve` | NOT TESTED |
-
-### Current Compilation Errors
-
-1. **Missing dependency**: `web_sys` not in Cargo.toml
-   - Error: `use of unresolved module or unlinked crate 'web_sys'`
-   - Fix: Add `web-sys = { version = "0.3", features = ["HtmlSelectElement"] }`
-
-2. **Type inference**: `use_memo` needs explicit type
-   - Error: `type must be known at this point`
-   - Fix: `let games: Rc<Vec<Box<dyn Game + Send>>> = use_memo(...)`
+| `cargo check` | PASSING |
+| `cargo clippy` | PASSING (1 minor warning) |
+| `trunk build` | PASSING |
+| `trunk serve` | WORKING |
 
 ## Component Status
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Yew App Shell | Skeleton | Compiles with fixes |
-| Game Picker | Partial | UI exists, needs type fix |
-| Canvas Element | Stub | In HTML, not wired to Rust |
-| Game Loop | Not Started | - |
-| Input Handling | Not Started | - |
-| Renderer Integration | Not Started | - |
+| Yew App Shell | Complete | Game picker, reset button |
+| Game Picker | Complete | Dropdown switches games |
+| Canvas Element | Complete | Full viewport, HiDPI support |
+| Game Loop | Complete | Fixed 60Hz timestep |
+| Input Handling | Complete | Keyboard (arrows/WASD/space) |
+| Canvas2D Renderer | Complete | Lines, polylines, text |
 | Touch Controls | Not Started | - |
 
 ## Dependency Repos Status
@@ -51,31 +42,29 @@ The repo contains initial scaffolding but is not yet functional.
 
 | Game | Implemented | Tested in Web |
 |------|-------------|---------------|
-| Pong | Yes (vectorcade-games) | No |
-| Asteroids | Yes (vectorcade-games) | No |
+| Pong | Yes | Yes - Working |
+| Asteroids | Yes | Yes - Working |
 | Lunar Lander | No | - |
 | Battlezone | No | - |
 | Tempest | No | - |
 
 ## Blockers
 
-1. **Compilation errors** must be fixed before any runtime testing
-2. **No renderer implementation** - NullRenderer doesn't draw anything
-3. **Game loop not wired** - no update/render cycle
+None for MVP. Additional games need implementation in vectorcade-games repo.
 
 ## Immediate Next Steps
 
-1. Fix Cargo.toml (add web-sys dependency)
-2. Fix main.rs type annotation
-3. Verify compilation
-4. Implement basic Canvas2D renderer
-5. Wire game loop
+1. Add Lunar Lander game
+2. Add touch controls for mobile
+3. Polish UI for video recording
+4. Optional: glow effects
 
 ## Milestones
 
-- [ ] Project compiles
-- [ ] trunk serve works
-- [ ] Single game renders on canvas
-- [ ] Input controls work
-- [ ] All games selectable
+- [x] Project compiles
+- [x] trunk serve works
+- [x] Single game renders on canvas
+- [x] Input controls work
+- [x] All available games selectable
+- [ ] 4-5 games playable
 - [ ] Video-recording ready
