@@ -110,7 +110,26 @@ impl InputState for WebInput {
 struct WebAudio;
 impl AudioOut for WebAudio {}
 
-/// Render DrawCmd list to Canvas2D.
+/// Global glow intensity multiplier (0.0 = off, 1.0 = full CRT effect).
+const GLOW_INTENSITY: f64 = 0.8;
+
+/// Apply CRT phosphor glow effect to the canvas context.
+fn apply_glow(ctx: &CanvasRenderingContext2d, color: &Rgba, glow: f32) {
+    if glow > 0.0 && GLOW_INTENSITY > 0.0 {
+        let blur = (8.0 + glow as f64 * 12.0) * GLOW_INTENSITY;
+        ctx.set_shadow_blur(blur);
+        ctx.set_shadow_color(&rgba_to_css_glow(color, 0.6 * glow * GLOW_INTENSITY as f32));
+    } else {
+        ctx.set_shadow_blur(0.0);
+    }
+}
+
+/// Clear glow effect.
+fn clear_glow(ctx: &CanvasRenderingContext2d) {
+    ctx.set_shadow_blur(0.0);
+}
+
+/// Render DrawCmd list to Canvas2D with CRT phosphor glow effects.
 fn render_to_canvas(
     ctx: &CanvasRenderingContext2d,
     cmds: &[DrawCmd],
@@ -129,13 +148,14 @@ fn render_to_canvas(
     for cmd in cmds {
         match cmd {
             DrawCmd::Clear { color } => {
+                clear_glow(ctx);
                 ctx.set_fill_style_str(&rgba_to_css(color));
                 ctx.fill_rect(0.0, 0.0, width, height);
             }
             DrawCmd::Line(line) => {
                 let (x1, y1) = to_px(line.a.x, line.a.y);
                 let (x2, y2) = to_px(line.b.x, line.b.y);
-                draw_line(ctx, x1, y1, x2, y2, &line.stroke);
+                draw_line_with_glow(ctx, x1, y1, x2, y2, &line.stroke);
             }
             DrawCmd::Polyline {
                 pts,
@@ -145,21 +165,7 @@ fn render_to_canvas(
                 if pts.len() < 2 {
                     continue;
                 }
-                ctx.begin_path();
-                let (x0, y0) = to_px(pts[0].x, pts[0].y);
-                ctx.move_to(x0, y0);
-                for pt in pts.iter().skip(1) {
-                    let (x, y) = to_px(pt.x, pt.y);
-                    ctx.line_to(x, y);
-                }
-                if *closed {
-                    ctx.close_path();
-                }
-                ctx.set_stroke_style_str(&rgba_to_css(&stroke.color));
-                ctx.set_line_width(stroke.width_px as f64);
-                ctx.set_line_cap("round");
-                ctx.set_line_join("round");
-                ctx.stroke();
+                draw_polyline_with_glow(ctx, pts, *closed, stroke, &to_px);
             }
             DrawCmd::Text {
                 pos,
@@ -168,7 +174,7 @@ fn render_to_canvas(
                 color,
                 style,
             } => {
-                render_vector_text(
+                render_vector_text_with_glow(
                     ctx, fonts, *style, text, pos.x, pos.y, *size_px, color, scale, cx, cy,
                 );
             }
@@ -177,10 +183,13 @@ fn render_to_canvas(
             DrawCmd::BeginLayer { .. } | DrawCmd::EndLayer => {}
         }
     }
+
+    // Ensure glow is cleared at end
+    clear_glow(ctx);
 }
 
-/// Render text using vector fonts.
-fn render_vector_text(
+/// Render text using vector fonts with CRT glow effect.
+fn render_vector_text_with_glow(
     ctx: &CanvasRenderingContext2d,
     fonts: &FontRegistry,
     style: FontStyleId,
@@ -203,6 +212,9 @@ fn render_vector_text(
         // No fonts available, skip rendering
         return;
     };
+
+    // Apply glow for text
+    apply_glow(ctx, color, 0.6);
 
     ctx.set_stroke_style_str(&rgba_to_css(color));
     ctx.set_line_width(2.0);
@@ -254,9 +266,64 @@ fn render_vector_text(
 
         cursor_x += font.advance(ch) * glyph_scale;
     }
+
+    clear_glow(ctx);
 }
 
-fn draw_line(ctx: &CanvasRenderingContext2d, x1: f64, y1: f64, x2: f64, y2: f64, stroke: &Stroke) {
+/// Draw a polyline with CRT glow effect.
+fn draw_polyline_with_glow<F>(
+    ctx: &CanvasRenderingContext2d,
+    pts: &[glam::Vec2],
+    closed: bool,
+    stroke: &Stroke,
+    to_px: &F,
+) where
+    F: Fn(f32, f32) -> (f64, f64),
+{
+    // Apply glow based on stroke settings
+    let effective_glow = if stroke.glow > 0.0 {
+        stroke.glow
+    } else {
+        0.5 // Default subtle glow for all lines
+    };
+    apply_glow(ctx, &stroke.color, effective_glow);
+
+    ctx.begin_path();
+    let (x0, y0) = to_px(pts[0].x, pts[0].y);
+    ctx.move_to(x0, y0);
+    for pt in pts.iter().skip(1) {
+        let (x, y) = to_px(pt.x, pt.y);
+        ctx.line_to(x, y);
+    }
+    if closed {
+        ctx.close_path();
+    }
+    ctx.set_stroke_style_str(&rgba_to_css(&stroke.color));
+    ctx.set_line_width(stroke.width_px as f64);
+    ctx.set_line_cap("round");
+    ctx.set_line_join("round");
+    ctx.stroke();
+
+    clear_glow(ctx);
+}
+
+/// Draw a line with CRT glow effect.
+fn draw_line_with_glow(
+    ctx: &CanvasRenderingContext2d,
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+    stroke: &Stroke,
+) {
+    // Apply glow based on stroke settings
+    let effective_glow = if stroke.glow > 0.0 {
+        stroke.glow
+    } else {
+        0.5 // Default subtle glow for all lines
+    };
+    apply_glow(ctx, &stroke.color, effective_glow);
+
     ctx.begin_path();
     ctx.move_to(x1, y1);
     ctx.line_to(x2, y2);
@@ -264,6 +331,8 @@ fn draw_line(ctx: &CanvasRenderingContext2d, x1: f64, y1: f64, x2: f64, y2: f64,
     ctx.set_line_width(stroke.width_px as f64);
     ctx.set_line_cap("round");
     ctx.stroke();
+
+    clear_glow(ctx);
 }
 
 fn rgba_to_css(c: &Rgba) -> String {
@@ -273,6 +342,17 @@ fn rgba_to_css(c: &Rgba) -> String {
         (c.1 * 255.0) as u8,
         (c.2 * 255.0) as u8,
         c.3
+    )
+}
+
+/// Convert RGBA to CSS with modified alpha for glow effect.
+fn rgba_to_css_glow(c: &Rgba, alpha_mult: f32) -> String {
+    format!(
+        "rgba({},{},{},{})",
+        (c.0 * 255.0) as u8,
+        (c.1 * 255.0) as u8,
+        (c.2 * 255.0) as u8,
+        (c.3 * alpha_mult).min(1.0)
     )
 }
 
