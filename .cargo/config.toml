@@ -1,0 +1,5 @@
+[patch.crates-io]
+vectorcade-shared = { path = "../vectorcade-shared/vectorcade-shared" }
+vectorcade-fonts = { path = "../vectorcade-fonts/vectorcade-fonts" }
+vectorcade-games = { path = "../vectorcade-games/vectorcade-games" }
+vectorcade-render-wgpu = { path = "../vectorcade-render-wgpu/vectorcade-render-wgpu" }

@@ -1,0 +1,37 @@
+# Rust / Cargo
+/target/
+**/target/
+Cargo.lock
+
+# WASM build artifacts
+/dist/
+**/dist/
+*.wasm
+*.wasm.d
+
+# Trunk
+.trunk/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+*.local
+
+# Logs
+*.log
+
+# Testing artifacts
+wasm-bindgen-test-*
+
+# Coverage
+*.profraw
+lcov.info
+coverage/
