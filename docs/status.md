@@ -44,7 +44,8 @@ Both Pong and Asteroids are playable in the browser via `trunk serve`.
 |------|-------------|---------------|
 | Pong | Yes | Yes - Working |
 | Asteroids | Yes | Yes - Working |
-| Lunar Lander | No | - |
+| Lunar Lander | Yes | Yes - Working |
+| Chess Demo | Yes | Yes - Working |
 | Battlezone | No | - |
 | Tempest | No | - |
 
@@ -66,5 +67,5 @@ None for MVP. Additional games need implementation in vectorcade-games repo.
 - [x] Single game renders on canvas
 - [x] Input controls work
 - [x] All available games selectable
-- [ ] 4-5 games playable
-- [ ] Video-recording ready
+- [x] 4 games playable (Pong, Asteroids, Lunar Lander, Chess Demo)
+- [x] Video-recording ready
