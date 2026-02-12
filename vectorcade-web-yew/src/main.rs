@@ -40,10 +40,14 @@ impl WebInput {
 
     fn map_code(code: &str) -> Option<Key> {
         match code {
-            "ArrowLeft" | "KeyA" => Some(Key::Left),
-            "ArrowRight" | "KeyD" => Some(Key::Right),
-            "ArrowUp" | "KeyW" => Some(Key::Up),
-            "ArrowDown" | "KeyS" => Some(Key::Down),
+            "ArrowLeft" => Some(Key::Left),
+            "ArrowRight" => Some(Key::Right),
+            "ArrowUp" => Some(Key::Up),
+            "ArrowDown" => Some(Key::Down),
+            "KeyW" => Some(Key::W),
+            "KeyA" => Some(Key::Left),
+            "KeyS" => Some(Key::S),
+            "KeyD" => Some(Key::Right),
             "Space" => Some(Key::Space),
             "Enter" => Some(Key::Enter),
             "Escape" => Some(Key::Escape),
