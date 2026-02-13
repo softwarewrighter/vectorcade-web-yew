@@ -17,8 +17,8 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import init, * as bindings from './vectorcade-web-yew-d6890a1031ec52e2.js';
-      const wasm = await init({ module_or_path: './vectorcade-web-yew-d6890a1031ec52e2_bg.wasm' });
+      import init, * as bindings from './vectorcade-web-yew-597caa6908aa9683.js';
+      const wasm = await init({ module_or_path: './vectorcade-web-yew-597caa6908aa9683_bg.wasm' });
       window.wasmBindings = bindings;
       dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     </script>
