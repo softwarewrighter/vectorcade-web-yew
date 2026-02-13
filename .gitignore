@@ -8,6 +8,8 @@ Cargo.lock
 **/dist/
 *.wasm
 *.wasm.d
+# But include pages/ wasm for GitHub Pages
+!pages/*.wasm
 
 # Trunk
 .trunk/
