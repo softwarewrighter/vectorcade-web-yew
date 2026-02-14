@@ -12,13 +12,43 @@
       .hud { position: absolute; top: 10px; left: 10px; color: white; font-family: monospace; }
       .panel { position: absolute; top: 10px; right: 10px; color: white; font-family: monospace; }
       select, button { font-family: monospace; }
+
+      /* About dialog styles */
+      .dialog-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex;
+        align-items: center; justify-content: center; z-index: 1000;
+      }
+      .dialog {
+        background: #1a1a2e; color: #eee; padding: 24px 32px;
+        border-radius: 8px; max-width: 400px; font-family: monospace;
+        border: 1px solid #4a4a6a; box-shadow: 0 0 20px rgba(100,100,255,0.3);
+      }
+      .dialog h2 { margin: 0 0 4px 0; color: #88f; font-size: 1.5em; }
+      .dialog .tagline { margin: 0 0 16px 0; color: #888; font-size: 0.9em; }
+      .dialog h3 { margin: 16px 0 8px 0; color: #aaf; font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 4px; }
+      .dialog .section { margin-bottom: 12px; }
+      .dialog table { font-size: 0.85em; }
+      .dialog td { padding: 2px 8px 2px 0; }
+      .dialog td:first-child { color: #888; }
+      .dialog ul { margin: 0; padding-left: 20px; font-size: 0.9em; }
+      .dialog li { margin: 4px 0; }
+      .dialog a { color: #8af; text-decoration: none; }
+      .dialog a:hover { text-decoration: underline; }
+      .dialog .copyright { font-size: 0.85em; color: #888; }
+      .dialog .close-btn {
+        margin-top: 16px; padding: 8px 24px; background: #336;
+        border: 1px solid #448; color: #fff; cursor: pointer;
+        font-family: monospace; border-radius: 4px;
+      }
+      .dialog .close-btn:hover { background: #448; }
     </style>
   </head>
   <body>
     <div id="app"></div>
     <script type="module">
-      import init, * as bindings from './vectorcade-web-yew-597caa6908aa9683.js';
-      const wasm = await init({ module_or_path: './vectorcade-web-yew-597caa6908aa9683_bg.wasm' });
+      import init, * as bindings from './vectorcade-web-yew-f81a2b3444c7efc7.js';
+      const wasm = await init({ module_or_path: './vectorcade-web-yew-f81a2b3444c7efc7_bg.wasm' });
       window.wasmBindings = bindings;
       dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     </script>

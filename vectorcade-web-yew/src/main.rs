@@ -4,6 +4,11 @@
 //! using wgpu rendering with 4x MSAA and keyboard/touch input.
 
 use std::cell::RefCell;
+
+// Build info from build.rs
+const BUILD_GIT_SHA: &str = env!("BUILD_GIT_SHA");
+const BUILD_TIMESTAMP: &str = env!("BUILD_TIMESTAMP");
+const BUILD_HOST: &str = env!("BUILD_HOST");
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -323,6 +328,23 @@ fn app() -> Html {
         });
     });
 
+    // About dialog state
+    let show_about = use_state(|| false);
+
+    let on_about = {
+        let show_about = show_about.clone();
+        Callback::from(move |_| {
+            show_about.set(true);
+        })
+    };
+
+    let on_close_about = {
+        let show_about = show_about.clone();
+        Callback::from(move |_| {
+            show_about.set(false);
+        })
+    };
+
     html! {
         <div style="position: relative; width: 100%; height: 100%;">
             <div class="hud">{ "VectorCade" }</div>
@@ -335,8 +357,45 @@ fn app() -> Html {
                     })}
                 </select>
                 <button onclick={on_reset}>{ "Reset" }</button>
+                <button onclick={on_about}>{ "About" }</button>
             </div>
             <canvas ref={canvas_ref} id="vectorcade-canvas"></canvas>
+
+            // About dialog
+            if *show_about {
+                <div class="dialog-overlay" onclick={on_close_about.clone()}>
+                    <div class="dialog" onclick={Callback::from(|e: web_sys::MouseEvent| e.stop_propagation())}>
+                        <h2>{ "VectorCade" }</h2>
+                        <p class="tagline">{ "Vector Arcade Games in WebGPU" }</p>
+
+                        <div class="section">
+                            <h3>{ "Build Info" }</h3>
+                            <table>
+                                <tr><td>{ "Host:" }</td><td>{ BUILD_HOST }</td></tr>
+                                <tr><td>{ "Built:" }</td><td>{ BUILD_TIMESTAMP }</td></tr>
+                                <tr><td>{ "Commit:" }</td><td>{ BUILD_GIT_SHA }</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="section">
+                            <h3>{ "Links" }</h3>
+                            <ul>
+                                <li><a href="https://github.com/softwarewrighter/vectorcade-web-yew" target="_blank">{ "GitHub Repository" }</a></li>
+                                <li><a href="https://software-wrighter-lab.github.io/2026/02/13/tbt-vector-graphics-games/" target="_blank">{ "Blog Post" }</a></li>
+                                <li><a href="https://www.youtube.com/watch?v=lxEFBzDjp3A" target="_blank">{ "Video Demo" }</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>{ "License" }</h3>
+                            <p>{ "MIT License" }</p>
+                            <p class="copyright">{ "Copyright (c) 2026 Michael A Wright" }</p>
+                        </div>
+
+                        <button class="close-btn" onclick={on_close_about}>{ "Close" }</button>
+                    </div>
+                </div>
+            }
         </div>
     }
 }
