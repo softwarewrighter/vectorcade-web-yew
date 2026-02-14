@@ -31,7 +31,7 @@ glam = "0.27"
 vectorcade-shared = { version = "0.1.0" }
 vectorcade-fonts = { version = "0.1.0" }
 vectorcade-games = { version = "0.1.0" }
-vectorcade-render-wgpu = { version = "0.1.0" }
+vectorcade-render-wgpu = { version = "0.1.0", features = ["wgpu-backend"] }
 
 [profile.release]
 lto = true
